@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Selection - Cricket Match</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      background-color: #2e7d32;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #2e7d32;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Player Selection</h1>
+
+  <div class="container">
+    <div class="form-group">
+      <label for="striker">Select Striker:</label>
+      <select id="striker"></select>
+    </div>
+
+    <div class="form-group">
+      <label for="non-striker">Select Non-Striker:</label>
+      <select id="non-striker"></select>
+    </div>
+
+    <div class="form-group">
+      <label for="bowler">Select Bowler:</label>
+      <select id="bowler"></select>
+    </div>
+
+    <button onclick="startMatch()">Start Match</button>
+  </div>
+
+  <script>
+    // Retrieve toss results from localStorage
+    const tossResult = JSON.parse(localStorage.getItem('tossResult'));
+    const team1 = tossResult.team1;
+    const team2 = tossResult.team2;
+
+    // List of players (example data)
+    const team1Players = ["Player 1A", "Player 2A", "Player 3A", "Player 4A", "Player 5A"];
+    const team2Players = ["Player 1B", "Player 2B", "Player 3B", "Player 4B", "Player 5B"];
+
+    // Function to populate player selections
+    function populatePlayers() {
+      const strikerSelect = document.getElementById('striker');
+      const nonStrikerSelect = document.getElementById('non-striker');
+      const bowlerSelect = document.getElementById('bowler');
+
+      // Populate dropdowns for striker, non-striker, and bowler
+      team1Players.forEach(player => {
+        const option = document.createElement('option');
+        option.value = player;
+        option.textContent = player;
+        strikerSelect.appendChild(option);
+        nonStrikerSelect.appendChild(option.cloneNode(true)); // Same players for non-striker
+      });
+
+      team2Players.forEach(player => {
+        const option = document.createElement('option');
+        option.value = player;
+        option.textContent = player;
+        bowlerSelect.appendChild(option);
+      });
+    }
+
+    // Call function to populate player options
+    populatePlayers();
+
+    // Function to start the match after selecting players
+    function startMatch() {
+      const striker = document.getElementById('striker').value;
+      const nonStriker = document.getElementById('non-striker').value;
+      const bowler = document.getElementById('bowler').value;
+
+      // Save player selection data
+      localStorage.setItem('matchPlayers', JSON.stringify({
+        striker,
+        nonStriker,
+        bowler
+      }));
+
+      // Redirect to match scoring page
+      window.location.href = 'match-scoring.html'; // Update with your match scoring page
+    }
+  </script>
+
+</body>
+</html>
