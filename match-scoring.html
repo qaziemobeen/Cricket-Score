@@ -27,7 +27,7 @@
       padding: 20px;
     }
 
-    .team-info, .batting-info, .bowling-info, .scoreboard {
+    .match-info, .batting-info, .bowling-info, .buttons {
       background-color: #fff;
       padding: 20px;
       margin-bottom: 20px;
@@ -44,22 +44,41 @@
       width: 48%;
     }
 
-    select, button, input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
 
-    button {
+    .buttons button {
+      width: 48%;
+      padding: 15px;
+      margin: 10px;
       background-color: #2e7d32;
       color: white;
+      font-size: 18px;
       cursor: pointer;
+      border-radius: 5px;
+      border: none;
     }
 
-    button:hover {
+    .buttons button:hover {
       background-color: #1b5e20;
+    }
+
+    .score-display {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .scoreboard div span {
+      font-size: 18px;
+      display: block;
+      margin-top: 10px;
+    }
+
+    #undo-btn {
+      background-color: #f44336;
     }
   </style>
 </head>
@@ -68,40 +87,39 @@
   <h1>Match Scoring</h1>
 
   <div class="container">
-    <!-- Display Team Info -->
-    <div class="team-info">
-      <h3>Team 1: <span id="team1-name"></span></h3>
-      <h3>Team 2: <span id="team2-name"></span></h3>
+    <!-- Match Info: Current Team Batting and Overs -->
+    <div class="match-info">
+      <h3>Batting: <span id="batting-team"></span></h3>
+      <p>Total Score/Fall of Wickets: <span id="total-score">0</span> / <span id="wickets">0</span></p>
+      <p>Overs: <span id="overs">0.0</span> (<span id="balls">0</span> balls)</p>
     </div>
 
-    <!-- Batting Information -->
+    <!-- Batting Info: Current Striker and Non-Striker -->
     <div class="batting-info">
-      <h3>Batting</h3>
-      <label for="current-batsman">Current Batsman:</label>
-      <select id="current-batsman"></select>
-
-      <label for="runs-scored">Runs Scored:</label>
-      <input type="number" id="runs-scored" min="0">
-
-      <label for="extras">Extras (Wide, No-Ball):</label>
-      <select id="extras">
-        <option value="wide">Wide</option>
-        <option value="no-ball">No-Ball</option>
-      </select>
-
-      <button onclick="updateScore()">Update Score</button>
+      <h3>Batting Info</h3>
+      <p>Striker: <span id="striker-name"></span></p>
+      <p>Non-Striker: <span id="non-striker-name"></span></p>
     </div>
 
-    <!-- Bowling Information -->
+    <!-- Bowling Info: Current Bowler -->
     <div class="bowling-info">
-      <h3>Bowling</h3>
-      <label for="current-bowler">Current Bowler:</label>
-      <select id="current-bowler"></select>
-
-      <button onclick="endOver()">End Over</button>
+      <h3>Bowler: <span id="bowler-name"></span></h3>
     </div>
 
-    <!-- Scoreboard -->
+    <!-- Score Buttons: Actions for Runs -->
+    <div class="buttons">
+      <button onclick="scoreRun(0)">Dot Ball</button>
+      <button onclick="scoreRun(1)">1</button>
+      <button onclick="scoreRun(2)">2</button>
+      <button onclick="scoreRun(3)">3</button>
+      <button onclick="scoreRun(4)">4</button>
+      <button onclick="scoreRun(6)">6</button>
+      <button onclick="scoreWide()">Wide</button>
+      <button onclick="scoreNoBall()">No-Ball</button>
+      <button onclick="undoLastBall()" id="undo-btn">Undo Last 2 Balls</button>
+    </div>
+
+    <!-- Scoreboard: Total Runs and Wickets -->
     <div class="scoreboard">
       <div>
         <h4>Innings 1</h4>
@@ -120,61 +138,89 @@
   </div>
 
   <script>
-    // Retrieve match data from localStorage
-    const matchData = JSON.parse(localStorage.getItem('matchPlayers'));
-    const tossResult = JSON.parse(localStorage.getItem('tossResult'));
+    // Initial Data (Simulate match data)
+    let battingTeam = "Team A";
+    let striker = "Player A";
+    let nonStriker = "Player B";
+    let bowler = "Player C";
 
-    const team1 = tossResult.team1;
-    const team2 = tossResult.team2;
+    let totalRuns = 0;
+    let totalWickets = 0;
+    let totalBalls = 0;
+    let totalOvers = 0;
+    let wickets = 0;
+    let ballHistory = [];
 
-    document.getElementById('team1-name').textContent = team1;
-    document.getElementById('team2-name').textContent = team2;
+    // Set the match data to page
+    document.getElementById('batting-team').textContent = battingTeam;
+    document.getElementById('striker-name').textContent = striker;
+    document.getElementById('non-striker-name').textContent = nonStriker;
+    document.getElementById('bowler-name').textContent = bowler;
 
-    const team1Players = ["Player 1A", "Player 2A", "Player 3A", "Player 4A", "Player 5A"];
-    const team2Players = ["Player 1B", "Player 2B", "Player 3B", "Player 4B", "Player 5B"];
+    // Update scoreboard
+    function updateScoreboard() {
+      document.getElementById('total-runs').textContent = totalRuns;
+      document.getElementById('total-wickets').textContent = totalWickets;
+      document.getElementById('overs').textContent = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
+      document.getElementById('balls').textContent = totalBalls;
 
-    // Populate batsman and bowler selections
-    const batsmanSelect = document.getElementById('current-batsman');
-    const bowlerSelect = document.getElementById('current-bowler');
+      // Update striker and non-striker
+      document.getElementById('striker-name').textContent = striker;
+      document.getElementById('non-striker-name').textContent = nonStriker;
+    }
 
-    team1Players.concat(team2Players).forEach(player => {
-      let option = document.createElement('option');
-      option.value = player;
-      option.textContent = player;
-      batsmanSelect.appendChild(option);
-      bowlerSelect.appendChild(option.cloneNode(true)); // Same players for bowler
-    });
+    // Score a run or event
+    function scoreRun(run) {
+      // Record ball history (for undo functionality)
+      ballHistory.push({ run, striker, nonStriker, totalRuns, totalBalls });
 
-    // Function to update score
-    function updateScore() {
-      const currentBatsman = document.getElementById('current-batsman').value;
-      const runsScored = parseInt(document.getElementById('runs-scored').value);
-      const extraType = document.getElementById('extras').value;
+      totalRuns += run;
+      totalBalls++;
 
-      // Update the total score based on runs scored
-      let totalRuns = parseInt(document.getElementById('total-runs').textContent);
-      totalRuns += runsScored;
-
-      if (extraType === 'wide' || extraType === 'no-ball') {
-        totalRuns += 1;  // For now, add 1 run for any extra (wide or no-ball)
+      // Switch striker on odd runs
+      if (run % 2 !== 0) {
+        [striker, nonStriker] = [nonStriker, striker];
       }
 
-      document.getElementById('total-runs').textContent = totalRuns;
+      // If 6 balls are bowled, change the over
+      if (totalBalls % 6 === 0) {
+        alert(`Over Ended!`);
+      }
 
-      // Add more logic for wickets, change batsman, etc.
-      alert(`Score updated for ${currentBatsman}`);
+      // Update scoreboard
+      updateScoreboard();
     }
 
-    // Function to end the over
-    function endOver() {
-      // Logic to end over: change bowler, update wickets, etc.
-      alert('Over Ended');
+    // Score a wide ball (1 extra run)
+    function scoreWide() {
+      totalRuns += 1;
+      totalBalls++;
+      updateScoreboard();
     }
 
-    // Function to end match
+    // Score a no-ball (1 extra run)
+    function scoreNoBall() {
+      totalRuns += 1;
+      totalBalls++;
+      updateScoreboard();
+    }
+
+    // Undo last ball (or last 2 balls)
+    function undoLastBall() {
+      if (ballHistory.length > 0) {
+        const lastBall = ballHistory.pop();
+        // Reset score and striker/non-striker to previous state
+        totalRuns = lastBall.totalRuns;
+        totalBalls--;
+        striker = lastBall.striker;
+        nonStriker = lastBall.nonStriker;
+        updateScoreboard();
+      }
+    }
+
+    // End match
     function endMatch() {
-      alert('Match Ended');
-      // Implement the match end logic, maybe show the winner, etc.
+      alert("Match Ended");
     }
   </script>
 
