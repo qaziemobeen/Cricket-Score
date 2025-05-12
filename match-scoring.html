@@ -167,46 +167,38 @@
   </div>
 
   <script>
-    // Initial Data (Simulate match data)
+    // Match Data Initialization
     let battingTeam = "Team A";
     let striker = "Player A";
     let nonStriker = "Player B";
     let bowler = "Player C";
-    let batsmen = ["Player A", "Player B", "Player C", "Player D", "Player E", "Player F", "Player G", "Player H", "Player I", "Player J"];
+    let maxOvers = 20; // Example, can be set dynamically from the first page
     let totalRuns = 0;
     let totalWickets = 0;
     let totalBalls = 0;
-    let totalOvers = 0;
+    let totalOversCount = 0;
     let wickets = 0;
-    let maxOvers = 20; // Overs limit from user input (can be adjusted)
+    let batsmen = ["Player A", "Player B", "Player C", "Player D", "Player E", "Player F", "Player G", "Player H", "Player I", "Player J"];
+    let batsmanScores = {};
     let ballHistory = [];
     let bowlerStats = {};
-    let batsmanScores = {};
 
-    // Set the match data to page
-    document.getElementById('batting-team').textContent = battingTeam;
-    document.getElementById('striker-name').textContent = striker;
-    document.getElementById('non-striker-name').textContent = nonStriker;
-    document.getElementById('bowler-name').textContent = bowler;
-
-    // Initialize batsman scores and bowler stats
+    // Initialize players and bowler stats
     batsmen.forEach(player => {
       batsmanScores[player] = { runs: 0, balls: 0 };
       bowlerStats[player] = { overs: 0, runs: 0, wickets: 0, currentOver: [] };
     });
 
-    // Update scoreboard
+    // Update Scoreboard
     function updateScoreboard() {
       document.getElementById('total-score').textContent = totalRuns;
       document.getElementById('wickets').textContent = totalWickets;
       document.getElementById('overs').textContent = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
       document.getElementById('balls').textContent = totalBalls;
 
-      // Update striker and non-striker
       document.getElementById('striker-name').textContent = striker;
       document.getElementById('non-striker-name').textContent = nonStriker;
 
-      // Update batsman scores
       updateBatsmanScores();
       updateBowlerStats();
     }
@@ -234,15 +226,14 @@
       });
     }
 
-    // Score a run or event
+    // Score Runs (Dot Ball, Singles, etc.)
     function scoreRun(run) {
-      // Record ball history (for undo functionality)
+      // Record ball history
       ballHistory.push({ run, striker, nonStriker, totalRuns, totalBalls });
 
       totalRuns += run;
       batsmanScores[striker].runs += run;
       batsmanScores[striker].balls++;
-
       totalBalls++;
 
       // Switch striker on odd runs
@@ -250,53 +241,47 @@
         [striker, nonStriker] = [nonStriker, striker];
       }
 
-      // If 6 balls are bowled, change the over
+      // End of over, change bowler
       if (totalBalls % 6 === 0) {
-        // Only change the bowler after the over ends
         document.getElementById('bowler-select').disabled = false;
       }
 
       updateScoreboard();
     }
 
-    // Score a wide ball (1 extra run)
+    // Wide Ball (extra run)
     function scoreWide() {
-      totalRuns += 1;
-      // Wide ball does not count as a legitimate ball, no increment in totalBalls
+      totalRuns += 1; // Wide adds one run
       updateScoreboard();
     }
 
-    // Score a no-ball (1 extra run)
+    // No Ball (extra run)
     function scoreNoBall() {
-      totalRuns += 1;
-      // No-ball does not count as a legitimate ball, no increment in totalBalls
+      totalRuns += 1; // No Ball adds one run
       updateScoreboard();
     }
 
-    // Record a Wicket
+    // Wicket taken
     function wicket() {
       totalWickets++;
-      // Replace the striker with a new batsman from the team
-      let availableBatsmen = batsmen.filter(player => batsmanScores[player].balls === 0);
-      let newBatsman = availableBatsmen.length ? availableBatsmen[0] : "Player X";
-      striker = newBatsman;
-
+      // Get the next batsman from the team
+      let nextBatsman = batsmen.find(player => batsmanScores[player].balls === 0);
+      striker = nextBatsman || "Player X"; // If no batsman left, show placeholder
+      
       updateScoreboard();
     }
 
-    // Change Bowler after over ends
+    // Change Bowler (only after over ends)
     function changeBowler() {
       bowler = document.getElementById('bowler-select').value;
       document.getElementById('bowler-name').textContent = bowler;
-      // Disable bowler change dropdown after over
       document.getElementById('bowler-select').disabled = true;
     }
 
-    // Undo last ball (or last 2 balls)
+    // Undo Last 2 Balls
     function undoLastBall() {
       if (ballHistory.length > 0) {
         const lastBall = ballHistory.pop();
-        // Reset score and striker/non-striker to previous state
         totalRuns = lastBall.totalRuns;
         totalBalls--;
         striker = lastBall.striker;
