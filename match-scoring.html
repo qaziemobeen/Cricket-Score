@@ -27,7 +27,7 @@
       padding: 20px;
     }
 
-    .match-info, .batting-info, .bowling-info, .buttons {
+    .top-section, .batting-info, .bowling-info, .buttons {
       background-color: #fff;
       padding: 20px;
       margin-bottom: 20px;
@@ -35,13 +35,25 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .scoreboard {
+    .top-section {
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
 
-    .scoreboard div {
+    .top-section div {
       width: 48%;
+    }
+
+    .top-section h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .score-display {
+      font-size: 22px;
+      font-weight: bold;
     }
 
     .buttons {
@@ -66,17 +78,6 @@
       background-color: #1b5e20;
     }
 
-    .score-display {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    .scoreboard div span {
-      font-size: 18px;
-      display: block;
-      margin-top: 10px;
-    }
-
     #undo-btn {
       background-color: #f44336;
     }
@@ -87,6 +88,10 @@
       border-radius: 5px;
       border: 1px solid #ddd;
     }
+
+    .batting-info h3, .bowling-info h3 {
+      margin-top: 0;
+    }
   </style>
 </head>
 <body>
@@ -94,31 +99,30 @@
   <h1>Match Scoring</h1>
 
   <div class="container">
-    <!-- Match Info: Current Team Batting and Overs -->
-    <div class="match-info">
-      <h3>Batting: <span id="batting-team"></span></h3>
-      <p>Total Score/Fall of Wickets: <span id="total-score">0</span> / <span id="wickets">0</span></p>
-      <p>Overs: <span id="overs">0.0</span> (<span id="balls">0</span> balls)</p>
+    <!-- Top Section: Score, Wickets, Overs, and Batting Team -->
+    <div class="top-section">
+      <div>
+        <h3>Batting Team: <span id="batting-team">Team A</span></h3>
+        <p>Total Score: <span id="total-score">0</span> / <span id="wickets">0</span></p>
+        <p>Overs: <span id="overs">0.0</span> (<span id="balls">0</span> balls)</p>
+      </div>
+      <div>
+        <h3>Current Striker: <span id="striker-name">Player A</span></h3>
+        <h3>Non-Striker: <span id="non-striker-name">Player B</span></h3>
+      </div>
     </div>
 
-    <!-- Batting Info: Current Striker and Non-Striker -->
-    <div class="batting-info">
-      <h3>Batting Info</h3>
-      <p>Striker: <span id="striker-name"></span></p>
-      <p>Non-Striker: <span id="non-striker-name"></span></p>
-    </div>
-
-    <!-- Bowling Info: Current Bowler -->
+    <!-- Bowling Info -->
     <div class="bowling-info">
-      <h3>Bowler: <span id="bowler-name"></span></h3>
-      <select id="bowler-select" class="select-box" onchange="changeBowler()">
+      <h3>Bowler: <span id="bowler-name">Player C</span></h3>
+      <select id="bowler-select" class="select-box" onchange="changeBowler()" disabled>
         <option value="Player A">Player A</option>
         <option value="Player B">Player B</option>
         <option value="Player C">Player C</option>
       </select>
     </div>
 
-    <!-- Score Buttons: Actions for Runs -->
+    <!-- Score Buttons -->
     <div class="buttons">
       <button onclick="scoreRun(0)">Dot Ball</button>
       <button onclick="scoreRun(1)">1</button>
@@ -131,23 +135,6 @@
       <button onclick="wicket()">Wicket</button>
       <button onclick="undoLastBall()" id="undo-btn">Undo Last 2 Balls</button>
     </div>
-
-    <!-- Scoreboard: Total Runs and Wickets -->
-    <div class="scoreboard">
-      <div>
-        <h4>Innings 1</h4>
-        <p>Total Runs: <span id="total-runs">0</span></p>
-        <p>Total Wickets: <span id="total-wickets">0</span></p>
-      </div>
-      <div>
-        <h4>Innings 2</h4>
-        <p>Total Runs: <span id="total-runs2">0</span></p>
-        <p>Total Wickets: <span id="total-wickets2">0</span></p>
-      </div>
-    </div>
-
-    <!-- End Match Button -->
-    <button onclick="endMatch()">End Match</button>
   </div>
 
   <script>
@@ -172,8 +159,8 @@
 
     // Update scoreboard
     function updateScoreboard() {
-      document.getElementById('total-runs').textContent = totalRuns;
-      document.getElementById('total-wickets').textContent = totalWickets;
+      document.getElementById('total-score').textContent = totalRuns;
+      document.getElementById('wickets').textContent = totalWickets;
       document.getElementById('overs').textContent = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
       document.getElementById('balls').textContent = totalBalls;
 
@@ -197,7 +184,8 @@
 
       // If 6 balls are bowled, change the over
       if (totalBalls % 6 === 0) {
-        alert(`Over Ended!`);
+        // Only change the bowler after the over ends
+        document.getElementById('bowler-select').disabled = false;
       }
 
       // Update scoreboard
@@ -221,8 +209,9 @@
     // Record a Wicket
     function wicket() {
       totalWickets++;
-      // Replace the striker with a new batsman
-      striker = batsmen.pop(); // Remove the last player from the list and set as new striker
+      // Replace the striker with a new batsman (prompt user to select)
+      const newBatsman = prompt("Enter the name of the new batsman:");
+      striker = newBatsman || "New Batsman";
       updateScoreboard();
     }
 
@@ -230,6 +219,8 @@
     function changeBowler() {
       bowler = document.getElementById('bowler-select').value;
       document.getElementById('bowler-name').textContent = bowler;
+      // Disable bowler change dropdown after over
+      document.getElementById('bowler-select').disabled = true;
     }
 
     // Undo last ball (or last 2 balls)
@@ -243,11 +234,6 @@
         nonStriker = lastBall.nonStriker;
         updateScoreboard();
       }
-    }
-
-    // End match
-    function endMatch() {
-      alert("Match Ended");
     }
   </script>
 
