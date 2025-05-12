@@ -73,11 +73,25 @@
       background-color: #1b5e20;
     }
 
+    /* Grid system for layout */
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    /* Team and Schedule Section */
     .teams, .schedule {
       margin-top: 30px;
       display: flex;
-      flex-direction: column;
-      gap: 15px;
+      flex-wrap: wrap;
+      gap: 20px;
     }
 
     .team, .match {
@@ -85,6 +99,7 @@
       border-radius: 8px;
       background-color: #fff;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      flex: 1 1 calc(33% - 20px);
     }
 
     .team h3 {
@@ -114,12 +129,23 @@
       background-color: #e65100;
     }
 
+    /* Input field styles inside the team section */
     .team input {
       margin-top: 10px;
       font-size: 14px;
       width: 100%;
     }
 
+    /* Make it responsive */
+    @media screen and (max-width: 768px) {
+      .team, .match {
+        flex: 1 1 100%; /* Stack items on smaller screens */
+      }
+
+      .row {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -128,33 +154,49 @@
   <h1>Cricket Tournament Setup</h1>
 
   <!-- Tournament Info -->
-  <div class="input-group">
-    <label for="tournament-name">Tournament Name:</label>
-    <input type="text" id="tournament-name" placeholder="Enter tournament name">
+  <div class="row">
+    <div class="column">
+      <div class="input-group">
+        <label for="tournament-name">Tournament Name:</label>
+        <input type="text" id="tournament-name" placeholder="Enter tournament name">
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="input-group">
+        <label for="tournament-date">Date:</label>
+        <input type="date" id="tournament-date">
+      </div>
+    </div>
   </div>
 
-  <div class="input-group">
-    <label for="tournament-date">Date:</label>
-    <input type="date" id="tournament-date">
+  <div class="row">
+    <div class="column">
+      <div class="input-group">
+        <label for="overs">Overs per match:</label>
+        <input type="number" id="overs" min="1" placeholder="Enter overs">
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="input-group">
+        <label for="teams">Number of Teams:</label>
+        <input type="number" id="teams" min="2" placeholder="Enter number of teams">
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="input-group">
+        <label for="players">Players per team:</label>
+        <input type="number" id="players" min="1" placeholder="Enter number of players per team">
+      </div>
+    </div>
   </div>
 
-  <div class="input-group">
-    <label for="overs">Overs per match:</label>
-    <input type="number" id="overs" min="1" placeholder="Enter overs">
+  <div class="row">
+    <button onclick="generateTeams()">Generate Teams</button>
+    <button onclick="generateSchedule()">Generate Schedule</button>
   </div>
-
-  <div class="input-group">
-    <label for="teams">Number of Teams:</label>
-    <input type="number" id="teams" min="2" placeholder="Enter number of teams">
-  </div>
-
-  <div class="input-group">
-    <label for="players">Players per team:</label>
-    <input type="number" id="players" min="1" placeholder="Enter number of players per team">
-  </div>
-
-  <button onclick="generateTeams()">Generate Teams</button>
-  <button onclick="generateSchedule()">Generate Schedule</button>
 
   <div id="teams-container" class="teams"></div>
   <div id="schedule-container" class="schedule"></div>
