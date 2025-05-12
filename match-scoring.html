@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Scoring - Cricket Tournament</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      background-color: #2e7d32;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .team-info, .batting-info, .bowling-info, .scoreboard {
+      background-color: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .scoreboard div {
+      width: 48%;
+    }
+
+    select, button, input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #2e7d32;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Match Scoring</h1>
+
+  <div class="container">
+    <!-- Display Team Info -->
+    <div class="team-info">
+      <h3>Team 1: <span id="team1-name"></span></h3>
+      <h3>Team 2: <span id="team2-name"></span></h3>
+    </div>
+
+    <!-- Batting Information -->
+    <div class="batting-info">
+      <h3>Batting</h3>
+      <label for="current-batsman">Current Batsman:</label>
+      <select id="current-batsman"></select>
+
+      <label for="runs-scored">Runs Scored:</label>
+      <input type="number" id="runs-scored" min="0">
+
+      <label for="extras">Extras (Wide, No-Ball):</label>
+      <select id="extras">
+        <option value="wide">Wide</option>
+        <option value="no-ball">No-Ball</option>
+      </select>
+
+      <button onclick="updateScore()">Update Score</button>
+    </div>
+
+    <!-- Bowling Information -->
+    <div class="bowling-info">
+      <h3>Bowling</h3>
+      <label for="current-bowler">Current Bowler:</label>
+      <select id="current-bowler"></select>
+
+      <button onclick="endOver()">End Over</button>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="scoreboard">
+      <div>
+        <h4>Innings 1</h4>
+        <p>Total Runs: <span id="total-runs">0</span></p>
+        <p>Total Wickets: <span id="total-wickets">0</span></p>
+      </div>
+      <div>
+        <h4>Innings 2</h4>
+        <p>Total Runs: <span id="total-runs2">0</span></p>
+        <p>Total Wickets: <span id="total-wickets2">0</span></p>
+      </div>
+    </div>
+
+    <!-- End Match Button -->
+    <button onclick="endMatch()">End Match</button>
+  </div>
+
+  <script>
+    // Retrieve match data from localStorage
+    const matchData = JSON.parse(localStorage.getItem('matchPlayers'));
+    const tossResult = JSON.parse(localStorage.getItem('tossResult'));
+
+    const team1 = tossResult.team1;
+    const team2 = tossResult.team2;
+
+    document.getElementById('team1-name').textContent = team1;
+    document.getElementById('team2-name').textContent = team2;
+
+    const team1Players = ["Player 1A", "Player 2A", "Player 3A", "Player 4A", "Player 5A"];
+    const team2Players = ["Player 1B", "Player 2B", "Player 3B", "Player 4B", "Player 5B"];
+
+    // Populate batsman and bowler selections
+    const batsmanSelect = document.getElementById('current-batsman');
+    const bowlerSelect = document.getElementById('current-bowler');
+
+    team1Players.concat(team2Players).forEach(player => {
+      let option = document.createElement('option');
+      option.value = player;
+      option.textContent = player;
+      batsmanSelect.appendChild(option);
+      bowlerSelect.appendChild(option.cloneNode(true)); // Same players for bowler
+    });
+
+    // Function to update score
+    function updateScore() {
+      const currentBatsman = document.getElementById('current-batsman').value;
+      const runsScored = parseInt(document.getElementById('runs-scored').value);
+      const extraType = document.getElementById('extras').value;
+
+      // Update the total score based on runs scored
+      let totalRuns = parseInt(document.getElementById('total-runs').textContent);
+      totalRuns += runsScored;
+
+      if (extraType === 'wide' || extraType === 'no-ball') {
+        totalRuns += 1;  // For now, add 1 run for any extra (wide or no-ball)
+      }
+
+      document.getElementById('total-runs').textContent = totalRuns;
+
+      // Add more logic for wickets, change batsman, etc.
+      alert(`Score updated for ${currentBatsman}`);
+    }
+
+    // Function to end the over
+    function endOver() {
+      // Logic to end over: change bowler, update wickets, etc.
+      alert('Over Ended');
+    }
+
+    // Function to end match
+    function endMatch() {
+      alert('Match Ended');
+      // Implement the match end logic, maybe show the winner, etc.
+    }
+  </script>
+
+</body>
+</html>
