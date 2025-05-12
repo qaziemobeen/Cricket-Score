@@ -89,8 +89,9 @@
       border: 1px solid #ddd;
     }
 
-    .batting-info h3, .bowling-info h3 {
-      margin-top: 0;
+    .batting-info, .bowling-info {
+      display: flex;
+      justify-content: space-between;
     }
 
     .batting-list, .bowling-stats {
@@ -104,6 +105,20 @@
 
     .batting-list li, .bowling-stats li {
       margin: 5px 0;
+    }
+
+    .player-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .player-stats span {
+      margin: 0 10px;
+    }
+
+    .player-info {
+      width: 48%;
     }
   </style>
 </head>
@@ -141,14 +156,21 @@
       </ul>
     </div>
 
-    <!-- Bowling Info -->
-    <div class="bowling-info">
-      <h3>Bowler: <span id="bowler-name">Player C</span></h3>
-      <select id="bowler-select" class="select-box" onchange="changeBowler()" disabled>
-        <option value="Player A">Player A</option>
-        <option value="Player B">Player B</option>
-        <option value="Player C">Player C</option>
-      </select>
+    <!-- Batting and Bowling Info -->
+    <div class="batting-info">
+      <div class="player-info">
+        <h3>Bowler: <span id="bowler-name">Player C</span></h3>
+        <select id="bowler-select" class="select-box" onchange="changeBowler()" disabled>
+          <option value="Player A">Player A</option>
+          <option value="Player B">Player B</option>
+          <option value="Player C">Player C</option>
+        </select>
+      </div>
+
+      <div class="player-info">
+        <h3>Current Striker: <span id="striker-name">Player A</span></h3>
+        <h3>Current Non-Striker: <span id="non-striker-name">Player B</span></h3>
+      </div>
     </div>
 
     <!-- Score Buttons -->
@@ -265,31 +287,32 @@
     function wicket() {
       totalWickets++;
       // Get the next batsman from the team
-      let nextBatsman = batsmen.find(player => batsmanScores[player].balls === 0);
-      striker = nextBatsman || "Player X"; // If no batsman left, show placeholder
-      
+      striker = batsmen[totalWickets];
+      batsmanScores[striker] = { runs: 0, balls: 0 }; // Initialize new batsman
       updateScoreboard();
     }
 
-    // Change Bowler (only after over ends)
+    // Change bowler
     function changeBowler() {
       bowler = document.getElementById('bowler-select').value;
       document.getElementById('bowler-name').textContent = bowler;
-      document.getElementById('bowler-select').disabled = true;
     }
 
-    // Undo Last 2 Balls
+    // Undo last ball
     function undoLastBall() {
-      if (ballHistory.length > 0) {
-        const lastBall = ballHistory.pop();
+      if (ballHistory.length > 1) {
+        ballHistory.pop();
+        let lastBall = ballHistory.pop();
         totalRuns = lastBall.totalRuns;
-        totalBalls--;
+        totalBalls = lastBall.totalBalls;
         striker = lastBall.striker;
         nonStriker = lastBall.nonStriker;
         updateScoreboard();
       }
     }
-  </script>
 
+    // Initial Call to update scoreboard
+    updateScoreboard();
+  </script>
 </body>
 </html>
