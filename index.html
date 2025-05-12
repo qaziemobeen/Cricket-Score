@@ -4,39 +4,128 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cricket Tournament Setup</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+  
   <style>
+    /* Reset default margins/paddings */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
     }
+
+    h1 {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      background-color: #2e7d32;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
     .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
     }
+
     .input-group {
       margin: 10px 0;
+      display: flex;
+      flex-direction: column;
     }
+
+    .input-group label {
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
     button {
       padding: 10px 20px;
-      background-color: #4CAF50;
+      background-color: #2e7d32;
       color: white;
       border: none;
+      border-radius: 5px;
       cursor: pointer;
+      font-size: 16px;
       margin-top: 20px;
+      transition: background-color 0.3s;
     }
+
+    button:hover {
+      background-color: #1b5e20;
+    }
+
     .teams, .schedule {
-      margin-top: 20px;
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
+
     .team, .match {
-      margin: 10px;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
+
+    .team h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #2e7d32;
+    }
+
+    .team ul {
+      list-style-type: none;
+    }
+
+    .team li {
+      padding: 5px 0;
+    }
+
+    .match p {
+      font-weight: bold;
+    }
+
+    .match button {
+      background-color: #ff8f00;
+      transition: background-color 0.3s;
+    }
+
+    .match button:hover {
+      background-color: #e65100;
+    }
+
+    .team input {
+      margin-top: 10px;
+      font-size: 14px;
+      width: 100%;
+    }
+
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Tournament Setup</h1>
+  <h1>Cricket Tournament Setup</h1>
 
   <!-- Tournament Info -->
   <div class="input-group">
@@ -92,15 +181,25 @@
       let teamName = `Team ${i}`;
       let players = [];
       for (let j = 1; j <= numPlayers; j++) {
-        players.push(`Player ${j}`);
+        players.push({ name: `Player ${j}`, editable: true });
       }
       teamsData.push({ teamName, players });
 
       const teamDiv = document.createElement('div');
       teamDiv.classList.add('team');
-      teamDiv.innerHTML = `<h3>${teamName}</h3><ul>${players.map(player => `<li>${player}</li>`).join('')}</ul>`;
+      teamDiv.innerHTML = `<h3>${teamName}</h3><ul>${players.map((player, index) => `
+        <li>
+          <input type="text" value="${player.name}" 
+          onchange="updatePlayerName(${i - 1}, ${index}, this.value)" 
+          ${player.editable ? '' : 'disabled'}>
+        </li>`).join('')}</ul>`;
       teamsContainer.appendChild(teamDiv);
     }
+  }
+
+  // Function to update player name
+  function updatePlayerName(teamIndex, playerIndex, newName) {
+    teamsData[teamIndex].players[playerIndex].name = newName;
   }
 
   // Function to generate schedule
