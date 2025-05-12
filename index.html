@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tournament Setup</title>
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
 
   <style>
@@ -43,7 +42,7 @@
     }
 
     .row > div {
-      flex: 1 1 200px;
+      flex: 1 1 300px;
       background-color: #fff;
       padding: 20px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -82,6 +81,20 @@
       background-color: #e65100;
     }
 
+    .team-block {
+      margin-top: 15px;
+      background: #eef1f5;
+      padding: 15px;
+      border-radius: 6px;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
@@ -110,7 +123,7 @@
     </div>
 
     <div class="schedule">
-      <h3>Schedule</h3>
+      <h3>Teams & Schedule</h3>
       <div id="schedule-container"></div>
       <button onclick="generateSchedule()">Generate Schedule</button>
     </div>
@@ -120,58 +133,78 @@
     let teamsData = [];
     let schedule = [];
 
-    // Generate Teams based on user input
     function generateTeams() {
       const noOfTeams = document.getElementById('no-of-teams').value;
       const noOfPlayers = document.getElementById('no-of-players').value;
-      const scheduleContainer = document.getElementById('schedule-container');
-
-      teamsData = [];
-      scheduleContainer.innerHTML = ''; // Clear previous teams
+      const container = document.getElementById('schedule-container');
 
       if (noOfTeams < 2 || noOfPlayers < 1) {
-        alert('Please enter valid values for teams and players');
+        alert('Please enter valid number of teams and players.');
         return;
       }
 
-      // Create teams
-      for (let i = 1; i <= noOfTeams; i++) {
+      container.innerHTML = '';
+      teamsData = [];
+
+      for (let i = 0; i < noOfTeams; i++) {
         let team = {
-          teamName: `Team ${i}`,
+          teamName: `Team ${i + 1}`,
           players: []
         };
 
-        // Create players for each team
-        for (let j = 1; j <= noOfPlayers; j++) {
-          team.players.push(`Player ${i}.${j}`);
+        for (let j = 0; j < noOfPlayers; j++) {
+          team.players.push(`Player ${i + 1}.${j + 1}`);
         }
 
         teamsData.push(team);
       }
 
-      // Display generated teams
+      renderTeamsEditable();
+    }
+
+    function renderTeamsEditable() {
+      const container = document.getElementById('schedule-container');
+      container.innerHTML = '';
+
       teamsData.forEach((team, index) => {
         const teamDiv = document.createElement('div');
-        teamDiv.innerHTML = `<p><strong>${team.teamName}</strong></p>
-                             <ul>${team.players.map(player => `<li>${player}</li>`).join('')}</ul>`;
-        scheduleContainer.appendChild(teamDiv);
+        teamDiv.className = 'team-block';
+
+        teamDiv.innerHTML = `
+          <ul>
+            <li>
+              Team Name: <input type="text" value="${team.teamName}" data-team-index="${index}" class="team-name-input">
+            </li>
+            ${team.players.map((player, pIndex) => `
+              <li>
+                Player ${pIndex + 1}: <input type="text" value="${player}" data-team-index="${index}" data-player-index="${pIndex}" class="player-name-input">
+              </li>`).join('')}
+          </ul>
+        `;
+
+        container.appendChild(teamDiv);
       });
     }
 
-    // Generate Schedule based on teams
     function generateSchedule() {
-      const teamsContainer = document.getElementById('schedule-container');
-      teamsContainer.innerHTML = ''; // Clear previous schedule
+      const container = document.getElementById('schedule-container');
+      schedule = [];
 
-      if (teamsData.length < 2) {
-        alert('Please generate teams first');
-        return;
-      }
+      // Apply edited names
+      document.querySelectorAll('.team-name-input').forEach(input => {
+        const i = input.dataset.teamIndex;
+        teamsData[i].teamName = input.value.trim();
+      });
 
-      schedule = []; // Reset schedule
+      document.querySelectorAll('.player-name-input').forEach(input => {
+        const i = input.dataset.teamIndex;
+        const j = input.dataset.playerIndex;
+        teamsData[i].players[j] = input.value.trim();
+      });
+
+      container.innerHTML = ''; // Clear previous content
+
       let matchCount = 1;
-
-      // Generate matches between teams
       for (let i = 0; i < teamsData.length; i++) {
         for (let j = i + 1; j < teamsData.length; j++) {
           const match = {
@@ -182,33 +215,27 @@
           };
           schedule.push(match);
 
-          // Create match div
           const matchDiv = document.createElement('div');
-          matchDiv.classList.add('match');
+          matchDiv.className = 'team-block';
           matchDiv.innerHTML = `
-            <p>Match ${match.matchNo}: ${match.team1} vs ${match.team2} - Status: ${match.status}</p>
+            <p><strong>Match ${match.matchNo}</strong>: ${match.team1} vs ${match.team2}</p>
             <button onclick="startMatch(${match.matchNo})">Start Match</button>
           `;
-          teamsContainer.appendChild(matchDiv);
+          container.appendChild(matchDiv);
         }
       }
 
-      // Save schedule to localStorage (if using localStorage method)
+      // Save to localStorage
       localStorage.setItem('schedule', JSON.stringify(schedule));
     }
 
-    // Function to redirect to match page
-   function startMatch(matchNo) {
-  const storedSchedule = JSON.parse(localStorage.getItem('schedule'));
-  const match = storedSchedule.find(m => m.matchNo === matchNo);
-  if (match) {
-    // Redirect to match page with parameters
-    window.location.href = `match.html?team1=${encodeURIComponent(match.team1)}&team2=${encodeURIComponent(match.team2)}&matchNo=${match.matchNo}`;
-  } else {
-    alert("Match not found.");
-  }
-}
-
+    function startMatch(matchNo) {
+      const storedSchedule = JSON.parse(localStorage.getItem('schedule'));
+      const match = storedSchedule.find(m => m.matchNo === matchNo);
+      if (match) {
+        window.location.href = `match.html?team1=${encodeURIComponent(match.team1)}&team2=${encodeURIComponent(match.team2)}&matchNo=${match.matchNo}`;
+      }
+    }
   </script>
 
 </body>
