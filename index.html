@@ -187,12 +187,20 @@
 
       const teamDiv = document.createElement('div');
       teamDiv.classList.add('team');
-      teamDiv.innerHTML = `<h3>${teamName}</h3><ul>${players.map((player, index) => `
-        <li>
-          <input type="text" value="${player.name}" 
-          onchange="updatePlayerName(${i - 1}, ${index}, this.value)" 
-          ${player.editable ? '' : 'disabled'}>
-        </li>`).join('')}</ul>`;
+      teamDiv.innerHTML = `
+        <h3>
+          <input type="text" value="${teamName}" 
+          onchange="updateTeamName(${i - 1}, this.value)">
+        </h3>
+        <ul>
+          ${players.map((player, index) => `
+            <li>
+              <input type="text" value="${player.name}" 
+              onchange="updatePlayerName(${i - 1}, ${index}, this.value)" 
+              ${player.editable ? '' : 'disabled'}>
+            </li>`).join('')}
+        </ul>
+      `;
       teamsContainer.appendChild(teamDiv);
     }
   }
@@ -200,6 +208,11 @@
   // Function to update player name
   function updatePlayerName(teamIndex, playerIndex, newName) {
     teamsData[teamIndex].players[playerIndex].name = newName;
+  }
+
+  // Function to update team name
+  function updateTeamName(teamIndex, newName) {
+    teamsData[teamIndex].teamName = newName;
   }
 
   // Function to generate schedule
