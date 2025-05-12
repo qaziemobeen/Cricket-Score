@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Match Details</title>
-  <!-- Google Fonts -->
+  <title>Match - Cricket Tournament</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
 
   <style>
@@ -43,14 +42,14 @@
     }
 
     .row > div {
-      flex: 1 1 200px;
+      flex: 1 1 300px;
       background-color: #fff;
       padding: 20px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
     }
 
-    input, button {
+    input, select, button {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -70,130 +69,89 @@
       background-color: #1b5e20;
     }
 
-    .scoreboard {
-      margin-top: 20px;
+    .team-block {
+      margin-top: 15px;
+      background: #eef1f5;
+      padding: 15px;
+      border-radius: 6px;
     }
 
-    .scoreboard div {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
+    ul {
+      list-style: none;
     }
 
-    .scoreboard button {
-      background-color: #ff8f00;
+    li {
+      margin-bottom: 5px;
     }
 
-    .scoreboard button:hover {
-      background-color: #e65100;
+    #toss-section {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>Match Details</h1>
+    <h1>Cricket Tournament Match</h1>
 
-    <div class="row">
-      <div>
-        <p><strong>Match:</strong> <span id="match-teams"></span></p>
+    <div id="toss-section">
+      <h3>🏆 Toss</h3>
+      <p><strong>Team 1:</strong> <span id="team1-name"></span></p>
+      <p><strong>Team 2:</strong> <span id="team2-name"></span></p>
 
-        <div class="scoreboard">
-          <h3>Batting Score</h3>
-          <div id="batting-score">
-            <div>
-              <span>Team 1</span>
-              <button onclick="updateBattingScore('team1', 1)">Add 1 Run</button>
-              <button onclick="updateBattingScore('team1', 4)">Add 4 Runs</button>
-              <button onclick="updateBattingScore('team1', 6)">Add 6 Runs</button>
-            </div>
-            <div>
-              <span>Team 2</span>
-              <button onclick="updateBattingScore('team2', 1)">Add 1 Run</button>
-              <button onclick="updateBattingScore('team2', 4)">Add 4 Runs</button>
-              <button onclick="updateBattingScore('team2', 6)">Add 6 Runs</button>
-            </div>
-          </div>
+      <label for="toss-winner">Toss Winner:</label>
+      <select id="toss-winner">
+        <option value="team1">Team 1</option>
+        <option value="team2">Team 2</option>
+      </select>
 
-          <h3>Bowling Score</h3>
-          <div id="bowling-score">
-            <div>
-              <span>Team 1</span>
-              <button onclick="updateBowlingScore('team1', 1)">Add 1 Wicket</button>
-            </div>
-            <div>
-              <span>Team 2</span>
-              <button onclick="updateBowlingScore('team2', 1)">Add 1 Wicket</button>
-            </div>
-          </div>
-        </div>
+      <label for="bat-or-bowl">Choose to:</label>
+      <select id="bat-or-bowl">
+        <option value="bat">Bat</option>
+        <option value="bowl">Bowl</option>
+      </select>
 
-        <button onclick="endMatch()">End Match</button>
-      </div>
+      <button onclick="submitToss()">Submit Toss</button>
     </div>
+
   </div>
 
   <script>
-    // Get match data from URL parameters
-    window.onload = function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const team1 = urlParams.get('team1');
-      const team2 = urlParams.get('team2');
-      const matchNo = urlParams.get('matchNo');
+    // Get team names from URL (Passed when clicking "Start Match")
+    const urlParams = new URLSearchParams(window.location.search);
+    const team1 = urlParams.get('team1');
+    const team2 = urlParams.get('team2');
 
-      document.getElementById('match-teams').innerText = `${team1} vs ${team2}`;
+    // Display team names in Toss UI
+    document.getElementById('team1-name').textContent = team1;
+    document.getElementById('team2-name').textContent = team2;
 
-      // Store match data in localStorage
-      localStorage.setItem('matchDetails', JSON.stringify({
-        matchNo: matchNo,
-        team1: {
-          name: team1,
-          score: 0,
-          wickets: 0
-        },
-        team2: {
-          name: team2,
-          score: 0,
-          wickets: 0
-        }
+    // Function to handle toss submission
+    function submitToss() {
+      const tossWinner = document.getElementById('toss-winner').value;
+      const batOrBowl = document.getElementById('bat-or-bowl').value;
+
+      // Save toss result to localStorage
+      localStorage.setItem('tossResult', JSON.stringify({
+        tossWinner,
+        batOrBowl,
+        team1,
+        team2
       }));
-    };
 
-    // Update Batting Score
-    function updateBattingScore(team, runs) {
-      const matchData = JSON.parse(localStorage.getItem('matchDetails'));
-      
-      if (team === 'team1') {
-        matchData.team1.score += runs;
-      } else if (team === 'team2') {
-        matchData.team2.score += runs;
-      }
+      // Redirect to the next page (Player Selection or scoring page)
+      alert(`Toss: ${tossWinner} chose to ${batOrBowl} first`);
 
-      localStorage.setItem('matchDetails', JSON.stringify(matchData));
-      alert(`${team === 'team1' ? 'Team 1' : 'Team 2'} scored ${runs} runs!`);
-    }
-
-    // Update Bowling Score
-    function updateBowlingScore(team, wickets) {
-      const matchData = JSON.parse(localStorage.getItem('matchDetails'));
-
-      if (team === 'team1') {
-        matchData.team1.wickets += wickets;
-      } else if (team === 'team2') {
-        matchData.team2.wickets += wickets;
-      }
-
-      localStorage.setItem('matchDetails', JSON.stringify(matchData));
-      alert(`${team === 'team1' ? 'Team 1' : 'Team 2'} took ${wickets} wicket(s)!`);
-    }
-
-    // End Match and display result
-    function endMatch() {
-      const matchData = JSON.parse(localStorage.getItem('matchDetails'));
-      const result = matchData.team1.score > matchData.team2.score ? `${matchData.team1.name} wins!` : `${matchData.team2.name} wins!`;
-      alert(result);
-      localStorage.removeItem('matchDetails');  // Clear match data
-      window.location.href = 'index.html';  // Redirect back to the tournament setup page
+      // For now, just redirect to player selection page (could be your next step)
+      window.location.href = 'player-selection.html';
     }
   </script>
 
