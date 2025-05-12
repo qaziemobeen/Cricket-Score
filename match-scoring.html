@@ -80,6 +80,13 @@
     #undo-btn {
       background-color: #f44336;
     }
+
+    .select-box {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
   </style>
 </head>
 <body>
@@ -104,6 +111,11 @@
     <!-- Bowling Info: Current Bowler -->
     <div class="bowling-info">
       <h3>Bowler: <span id="bowler-name"></span></h3>
+      <select id="bowler-select" class="select-box" onchange="changeBowler()">
+        <option value="Player A">Player A</option>
+        <option value="Player B">Player B</option>
+        <option value="Player C">Player C</option>
+      </select>
     </div>
 
     <!-- Score Buttons: Actions for Runs -->
@@ -116,6 +128,7 @@
       <button onclick="scoreRun(6)">6</button>
       <button onclick="scoreWide()">Wide</button>
       <button onclick="scoreNoBall()">No-Ball</button>
+      <button onclick="wicket()">Wicket</button>
       <button onclick="undoLastBall()" id="undo-btn">Undo Last 2 Balls</button>
     </div>
 
@@ -143,7 +156,7 @@
     let striker = "Player A";
     let nonStriker = "Player B";
     let bowler = "Player C";
-
+    let batsmen = ["Player A", "Player B", "Player C", "Player D", "Player E"];
     let totalRuns = 0;
     let totalWickets = 0;
     let totalBalls = 0;
@@ -194,15 +207,29 @@
     // Score a wide ball (1 extra run)
     function scoreWide() {
       totalRuns += 1;
-      totalBalls++;
+      // Wide ball does not count as a legitimate ball, no increment in totalBalls
       updateScoreboard();
     }
 
     // Score a no-ball (1 extra run)
     function scoreNoBall() {
       totalRuns += 1;
-      totalBalls++;
+      // No-ball does not count as a legitimate ball, no increment in totalBalls
       updateScoreboard();
+    }
+
+    // Record a Wicket
+    function wicket() {
+      totalWickets++;
+      // Replace the striker with a new batsman
+      striker = batsmen.pop(); // Remove the last player from the list and set as new striker
+      updateScoreboard();
+    }
+
+    // Change Bowler after over ends
+    function changeBowler() {
+      bowler = document.getElementById('bowler-select').value;
+      document.getElementById('bowler-name').textContent = bowler;
     }
 
     // Undo last ball (or last 2 balls)
