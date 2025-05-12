@@ -92,6 +92,19 @@
     .batting-info h3, .bowling-info h3 {
       margin-top: 0;
     }
+
+    .batting-list, .bowling-stats {
+      margin-top: 20px;
+    }
+
+    .batting-list ul, .bowling-stats ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .batting-list li, .bowling-stats li {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
@@ -110,6 +123,22 @@
         <h3>Current Striker: <span id="striker-name">Player A</span></h3>
         <h3>Non-Striker: <span id="non-striker-name">Player B</span></h3>
       </div>
+    </div>
+
+    <!-- Batting List: Player Scores -->
+    <div class="batting-list">
+      <h3>Batsman Scores:</h3>
+      <ul id="batting-scores">
+        <!-- Batsman scores will appear here dynamically -->
+      </ul>
+    </div>
+
+    <!-- Bowling Stats -->
+    <div class="bowling-stats">
+      <h3>Bowler Stats:</h3>
+      <ul id="bowler-stats">
+        <!-- Bowler stats will appear here dynamically -->
+      </ul>
     </div>
 
     <!-- Bowling Info -->
@@ -143,19 +172,28 @@
     let striker = "Player A";
     let nonStriker = "Player B";
     let bowler = "Player C";
-    let batsmen = ["Player A", "Player B", "Player C", "Player D", "Player E"];
+    let batsmen = ["Player A", "Player B", "Player C", "Player D", "Player E", "Player F", "Player G", "Player H", "Player I", "Player J"];
     let totalRuns = 0;
     let totalWickets = 0;
     let totalBalls = 0;
     let totalOvers = 0;
     let wickets = 0;
+    let maxOvers = 20; // Overs limit from user input (can be adjusted)
     let ballHistory = [];
+    let bowlerStats = {};
+    let batsmanScores = {};
 
     // Set the match data to page
     document.getElementById('batting-team').textContent = battingTeam;
     document.getElementById('striker-name').textContent = striker;
     document.getElementById('non-striker-name').textContent = nonStriker;
     document.getElementById('bowler-name').textContent = bowler;
+
+    // Initialize batsman scores and bowler stats
+    batsmen.forEach(player => {
+      batsmanScores[player] = { runs: 0, balls: 0 };
+      bowlerStats[player] = { overs: 0, runs: 0, wickets: 0, currentOver: [] };
+    });
 
     // Update scoreboard
     function updateScoreboard() {
@@ -167,6 +205,33 @@
       // Update striker and non-striker
       document.getElementById('striker-name').textContent = striker;
       document.getElementById('non-striker-name').textContent = nonStriker;
+
+      // Update batsman scores
+      updateBatsmanScores();
+      updateBowlerStats();
+    }
+
+    // Update Batsman Scores
+    function updateBatsmanScores() {
+      let battingScoresList = document.getElementById('batting-scores');
+      battingScoresList.innerHTML = '';
+      batsmen.forEach(player => {
+        let li = document.createElement('li');
+        li.textContent = `${player} ${batsmanScores[player].runs}(${batsmanScores[player].balls})`;
+        battingScoresList.appendChild(li);
+      });
+    }
+
+    // Update Bowler Stats
+    function updateBowlerStats() {
+      let bowlerStatsList = document.getElementById('bowler-stats');
+      bowlerStatsList.innerHTML = '';
+      Object.keys(bowlerStats).forEach(bowler => {
+        let stats = bowlerStats[bowler];
+        let li = document.createElement('li');
+        li.textContent = `${bowler}: (${Math.floor(stats.overs)}.${stats.currentOver.length}) - ${stats.runs} runs, ${stats.wickets} wickets`;
+        bowlerStatsList.appendChild(li);
+      });
     }
 
     // Score a run or event
@@ -175,6 +240,9 @@
       ballHistory.push({ run, striker, nonStriker, totalRuns, totalBalls });
 
       totalRuns += run;
+      batsmanScores[striker].runs += run;
+      batsmanScores[striker].balls++;
+
       totalBalls++;
 
       // Switch striker on odd runs
@@ -188,7 +256,6 @@
         document.getElementById('bowler-select').disabled = false;
       }
 
-      // Update scoreboard
       updateScoreboard();
     }
 
@@ -209,9 +276,11 @@
     // Record a Wicket
     function wicket() {
       totalWickets++;
-      // Replace the striker with a new batsman (prompt user to select)
-      const newBatsman = prompt("Enter the name of the new batsman:");
-      striker = newBatsman || "New Batsman";
+      // Replace the striker with a new batsman from the team
+      let availableBatsmen = batsmen.filter(player => batsmanScores[player].balls === 0);
+      let newBatsman = availableBatsmen.length ? availableBatsmen[0] : "Player X";
+      striker = newBatsman;
+
       updateScoreboard();
     }
 
