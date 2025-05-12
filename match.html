@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Details</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    h1 {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      background-color: #2e7d32;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .row > div {
+      flex: 1 1 200px;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #1b5e20;
+    }
+
+    .scoreboard {
+      margin-top: 20px;
+    }
+
+    .scoreboard div {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .scoreboard button {
+      background-color: #ff8f00;
+    }
+
+    .scoreboard button:hover {
+      background-color: #e65100;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Match Details</h1>
+
+    <div class="row">
+      <div>
+        <p><strong>Match:</strong> <span id="match-teams"></span></p>
+
+        <div class="scoreboard">
+          <h3>Batting Score</h3>
+          <div id="batting-score">
+            <div>
+              <span>Team 1</span>
+              <button onclick="updateBattingScore('team1', 1)">Add 1 Run</button>
+              <button onclick="updateBattingScore('team1', 4)">Add 4 Runs</button>
+              <button onclick="updateBattingScore('team1', 6)">Add 6 Runs</button>
+            </div>
+            <div>
+              <span>Team 2</span>
+              <button onclick="updateBattingScore('team2', 1)">Add 1 Run</button>
+              <button onclick="updateBattingScore('team2', 4)">Add 4 Runs</button>
+              <button onclick="updateBattingScore('team2', 6)">Add 6 Runs</button>
+            </div>
+          </div>
+
+          <h3>Bowling Score</h3>
+          <div id="bowling-score">
+            <div>
+              <span>Team 1</span>
+              <button onclick="updateBowlingScore('team1', 1)">Add 1 Wicket</button>
+            </div>
+            <div>
+              <span>Team 2</span>
+              <button onclick="updateBowlingScore('team2', 1)">Add 1 Wicket</button>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="endMatch()">End Match</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get match data from URL parameters
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const team1 = urlParams.get('team1');
+      const team2 = urlParams.get('team2');
+      const matchNo = urlParams.get('matchNo');
+
+      document.getElementById('match-teams').innerText = `${team1} vs ${team2}`;
+
+      // Store match data in localStorage
+      localStorage.setItem('matchDetails', JSON.stringify({
+        matchNo: matchNo,
+        team1: {
+          name: team1,
+          score: 0,
+          wickets: 0
+        },
+        team2: {
+          name: team2,
+          score: 0,
+          wickets: 0
+        }
+      }));
+    };
+
+    // Update Batting Score
+    function updateBattingScore(team, runs) {
+      const matchData = JSON.parse(localStorage.getItem('matchDetails'));
+      
+      if (team === 'team1') {
+        matchData.team1.score += runs;
+      } else if (team === 'team2') {
+        matchData.team2.score += runs;
+      }
+
+      localStorage.setItem('matchDetails', JSON.stringify(matchData));
+      alert(`${team === 'team1' ? 'Team 1' : 'Team 2'} scored ${runs} runs!`);
+    }
+
+    // Update Bowling Score
+    function updateBowlingScore(team, wickets) {
+      const matchData = JSON.parse(localStorage.getItem('matchDetails'));
+
+      if (team === 'team1') {
+        matchData.team1.wickets += wickets;
+      } else if (team === 'team2') {
+        matchData.team2.wickets += wickets;
+      }
+
+      localStorage.setItem('matchDetails', JSON.stringify(matchData));
+      alert(`${team === 'team1' ? 'Team 1' : 'Team 2'} took ${wickets} wicket(s)!`);
+    }
+
+    // End Match and display result
+    function endMatch() {
+      const matchData = JSON.parse(localStorage.getItem('matchDetails'));
+      const result = matchData.team1.score > matchData.team2.score ? `${matchData.team1.name} wins!` : `${matchData.team2.name} wins!`;
+      alert(result);
+      localStorage.removeItem('matchDetails');  // Clear match data
+      window.location.href = 'index.html';  // Redirect back to the tournament setup page
+    }
+  </script>
+
+</body>
+</html>
