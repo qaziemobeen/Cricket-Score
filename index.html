@@ -198,14 +198,17 @@
     }
 
     // Function to redirect to match page
-    function startMatch(matchNo) {
-      // Get match data from schedule
-      const match = schedule.find(m => m.matchNo === matchNo);
-      if (match) {
-        // Redirect to the match page with URL parameters (team1, team2, matchNo)
-        window.location.href = `match.html?team1=${match.team1}&team2=${match.team2}&matchNo=${match.matchNo}`;
-      }
-    }
+   function startMatch(matchNo) {
+  const storedSchedule = JSON.parse(localStorage.getItem('schedule'));
+  const match = storedSchedule.find(m => m.matchNo === matchNo);
+  if (match) {
+    // Redirect to match page with parameters
+    window.location.href = `match.html?team1=${encodeURIComponent(match.team1)}&team2=${encodeURIComponent(match.team2)}&matchNo=${match.matchNo}`;
+  } else {
+    alert("Match not found.");
+  }
+}
+
   </script>
 
 </body>
