@@ -286,33 +286,11 @@
     // Wicket taken
     function wicket() {
       totalWickets++;
-      // Get the next batsman from the team
-      striker = batsmen[totalWickets];
-      batsmanScores[striker] = { runs: 0, balls: 0 }; // Initialize new batsman
-      updateScoreboard();
-    }
-
-    // Change bowler
-    function changeBowler() {
-      bowler = document.getElementById('bowler-select').value;
-      document.getElementById('bowler-name').textContent = bowler;
-    }
-
-    // Undo last ball
-    function undoLastBall() {
-      if (ballHistory.length > 1) {
-        ballHistory.pop();
-        let lastBall = ballHistory.pop();
-        totalRuns = lastBall.totalRuns;
-        totalBalls = lastBall.totalBalls;
-        striker = lastBall.striker;
-        nonStriker = lastBall.nonStriker;
-        updateScoreboard();
-      }
-    }
-
-    // Initial Call to update scoreboard
-    updateScoreboard();
-  </script>
-</body>
-</html>
+      
+      // Prompt for next batsman selection
+      let availableBatsmen = batsmen.filter(player => !Object.keys(batsmanScores).includes(player));
+      if (availableBatsmen.length > 0) {
+        let nextBatsman = prompt(`Select Next Batsman:\n${availableBatsmen.join(", ")}`);
+        if (nextBatsman && availableBatsmen.includes(nextBatsman)) {
+          striker = nextBatsman;
+       
