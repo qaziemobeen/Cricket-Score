@@ -129,6 +129,7 @@
     .team-select-btn {
       background-color: #9c27b0;
       color: white;
+      width: 200px;
     }
 
     .team-select-btn:hover {
@@ -161,14 +162,14 @@
         <button class="method-btn" onclick="showManualToss()">Manual Selection</button>
       </div>
 
-      <div class="hidden" id="auto-toss">
+      <div id="auto-toss" class="hidden">
         <p>Click the button to simulate the toss between the two teams:</p>
         <div style="text-align: center;">
           <button class="toss-btn" onclick="simulateToss()">Do the Toss</button>
         </div>
       </div>
 
-      <div class="hidden" id="manual-toss">
+      <div id="manual-toss" class="hidden">
         <p>Select which team won the toss:</p>
         <div class="toss-options">
           <button class="team-select-btn" id="team1-btn" onclick="manualTossWinner(this)"></button>
