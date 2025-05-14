@@ -13,55 +13,37 @@
       margin: 0;
       padding: 0;
     }
-
     h1 {
       background-color: #2e7d32;
       color: white;
       text-align: center;
       padding: 20px;
     }
-
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
-
-    .top-section, .batting-info, .bowling-info, .buttons {
+    .team-info {
       background-color: #fff;
       padding: 20px;
       margin-bottom: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-
-    .top-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .top-section div {
-      width: 48%;
-    }
-
-    .top-section h3 {
+    .team-info h3 {
       margin: 0;
       font-size: 20px;
       font-weight: 600;
     }
-
-    .score-display {
-      font-size: 22px;
-      font-weight: bold;
+    .team-info p {
+      margin: 5px 0;
     }
-
     .buttons {
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
     }
-
     .buttons button {
       width: 48%;
       padding: 15px;
@@ -73,224 +55,10 @@
       border-radius: 5px;
       border: none;
     }
-
     .buttons button:hover {
       background-color: #1b5e20;
     }
-
     #undo-btn {
-      background-color: #f44336;
-    }
-
-    .select-box {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-    }
-
-    .batting-info, .bowling-info {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .batting-list, .bowling-stats {
-      margin-top: 20px;
-    }
-
-    .batting-list ul, .bowling-stats ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .batting-list li, .bowling-stats li {
-      margin: 5px 0;
-    }
-
-    .player-stats {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .player-stats span {
-      margin: 0 10px;
-    }
-
-    .player-info {
-      width: 48%;
-    }
-  </style>
-</head>
-<body>
-
-  <h1>Match Scoring</h1>
-
-  <div class="container">
-    <!-- Top Section: Score, Wickets, Overs, and Batting Team -->
-    <div class="top-section">
-      <div>
-        <h3>Batting Team: <span id="batting-team">Team A</span></h3>
-        <p>Total Score: <span id="total-score">0</span> / <span id="wickets">0</span></p>
-        <p>Overs: <span id="overs">0.0</span> (<span id="balls">0</span> balls)</p>
-      </div>
-      <div>
-        <h3>Current Striker: <span id="striker-name">Player A</span></h3>
-        <h3>Non-Striker: <span id="non-striker-name">Player B</span></h3>
-      </div>
-    </div>
-
-    <!-- Batting List: Player Scores -->
-    <div class="batting-list">
-      <h3>Batsman Scores:</h3>
-      <ul id="batting-scores">
-        <!-- Batsman scores will appear here dynamically -->
-      </ul>
-    </div>
-
-    <!-- Bowling Stats -->
-    <div class="bowling-stats">
-      <h3>Bowler Stats:</h3>
-      <ul id="bowler-stats">
-        <!-- Bowler stats will appear here dynamically -->
-      </ul>
-    </div>
-
-    <!-- Batting and Bowling Info -->
-    <div class="batting-info">
-      <div class="player-info">
-        <h3>Bowler: <span id="bowler-name">Player C</span></h3>
-        <select id="bowler-select" class="select-box" onchange="changeBowler()" disabled>
-          <option value="Player A">Player A</option>
-          <option value="Player B">Player B</option>
-          <option value="Player C">Player C</option>
-        </select>
-      </div>
-
-      <div class="player-info">
-        <h3>Current Striker: <span id="striker-name">Player A</span></h3>
-        <h3>Current Non-Striker: <span id="non-striker-name">Player B</span></h3>
-      </div>
-    </div>
-
-    <!-- Score Buttons -->
-    <div class="buttons">
-      <button onclick="scoreRun(0)">Dot Ball</button>
-      <button onclick="scoreRun(1)">1</button>
-      <button onclick="scoreRun(2)">2</button>
-      <button onclick="scoreRun(3)">3</button>
-      <button onclick="scoreRun(4)">4</button>
-      <button onclick="scoreRun(6)">6</button>
-      <button onclick="scoreWide()">Wide</button>
-      <button onclick="scoreNoBall()">No-Ball</button>
-      <button onclick="wicket()">Wicket</button>
-      <button onclick="undoLastBall()" id="undo-btn">Undo Last 2 Balls</button>
-    </div>
-  </div>
-
-  <script>
-    // Match Data Initialization
-    let battingTeam = "Team A";
-    let striker = "Player A";
-    let nonStriker = "Player B";
-    let bowler = "Player C";
-    let maxOvers = 20; // Example, can be set dynamically from the first page
-    let totalRuns = 0;
-    let totalWickets = 0;
-    let totalBalls = 0;
-    let totalOversCount = 0;
-    let wickets = 0;
-    let batsmen = ["Player A", "Player B", "Player C", "Player D", "Player E", "Player F", "Player G", "Player H", "Player I", "Player J"];
-    let batsmanScores = {};
-    let ballHistory = [];
-    let bowlerStats = {};
-
-    // Initialize players and bowler stats
-    batsmen.forEach(player => {
-      batsmanScores[player] = { runs: 0, balls: 0 };
-      bowlerStats[player] = { overs: 0, runs: 0, wickets: 0, currentOver: [] };
-    });
-
-    // Update Scoreboard
-    function updateScoreboard() {
-      document.getElementById('total-score').textContent = totalRuns;
-      document.getElementById('wickets').textContent = totalWickets;
-      document.getElementById('overs').textContent = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
-      document.getElementById('balls').textContent = totalBalls;
-
-      document.getElementById('striker-name').textContent = striker;
-      document.getElementById('non-striker-name').textContent = nonStriker;
-
-      updateBatsmanScores();
-      updateBowlerStats();
-    }
-
-    // Update Batsman Scores
-    function updateBatsmanScores() {
-      let battingScoresList = document.getElementById('batting-scores');
-      battingScoresList.innerHTML = '';
-      batsmen.forEach(player => {
-        let li = document.createElement('li');
-        li.textContent = `${player} ${batsmanScores[player].runs}(${batsmanScores[player].balls})`;
-        battingScoresList.appendChild(li);
-      });
-    }
-
-    // Update Bowler Stats
-    function updateBowlerStats() {
-      let bowlerStatsList = document.getElementById('bowler-stats');
-      bowlerStatsList.innerHTML = '';
-      Object.keys(bowlerStats).forEach(bowler => {
-        let stats = bowlerStats[bowler];
-        let li = document.createElement('li');
-        li.textContent = `${bowler}: (${Math.floor(stats.overs)}.${stats.currentOver.length}) - ${stats.runs} runs, ${stats.wickets} wickets`;
-        bowlerStatsList.appendChild(li);
-      });
-    }
-
-    // Score Runs (Dot Ball, Singles, etc.)
-    function scoreRun(run) {
-      // Record ball history
-      ballHistory.push({ run, striker, nonStriker, totalRuns, totalBalls });
-
-      totalRuns += run;
-      batsmanScores[striker].runs += run;
-      batsmanScores[striker].balls++;
-      totalBalls++;
-
-      // Switch striker on odd runs
-      if (run % 2 !== 0) {
-        [striker, nonStriker] = [nonStriker, striker];
-      }
-
-      // End of over, change bowler
-      if (totalBalls % 6 === 0) {
-        document.getElementById('bowler-select').disabled = false;
-      }
-
-      updateScoreboard();
-    }
-
-    // Wide Ball (extra run)
-    function scoreWide() {
-      totalRuns += 1; // Wide adds one run
-      updateScoreboard();
-    }
-
-    // No Ball (extra run)
-    function scoreNoBall() {
-      totalRuns += 1; // No Ball adds one run
-      updateScoreboard();
-    }
-
-    // Wicket taken
-    function wicket() {
-      totalWickets++;
-      
-      // Prompt for next batsman selection
-      let availableBatsmen = batsmen.filter(player => !Object.keys(batsmanScores).includes(player));
-      if (availableBatsmen.length > 0) {
-        let nextBatsman = prompt(`Select Next Batsman:\n${availableBatsmen.join(", ")}`);
-        if (nextBatsman && availableBatsmen.includes(nextBatsman)) {
-          striker = nextBatsman;
-       
+      background-color: #f
+::contentReference[oaicite:0]{index=0}
+ 
