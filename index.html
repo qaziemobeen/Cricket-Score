@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tournament Setup</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
-
   <style>
     * {
       margin: 0;
@@ -95,6 +94,21 @@
     li {
       margin-bottom: 5px;
     }
+
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .team-column {
+      flex: 1 1 300px;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
@@ -134,8 +148,8 @@
     let schedule = [];
 
     function generateTeams() {
-      const noOfTeams = document.getElementById('no-of-teams').value;
-      const noOfPlayers = document.getElementById('no-of-players').value;
+      const noOfTeams = parseInt(document.getElementById('no-of-teams').value);
+      const noOfPlayers = parseInt(document.getElementById('no-of-players').value);
       const container = document.getElementById('schedule-container');
 
       if (noOfTeams < 2 || noOfPlayers < 1) {
@@ -162,27 +176,58 @@
       renderTeamsEditable();
     }
 
+    function getTeamLayout(total) {
+      if (total <= 3) return [total];
+      if (total === 4) return [2, 2];
+      if (total === 5) return [3, 2];
+      if (total === 6) return [3, 3];
+      if (total === 7) return [3, 2, 2];
+      if (total === 8) return [3, 3, 2];
+      if (total === 9) return [3, 3, 3];
+      if (total === 10) return [3, 3, 2, 2];
+      
+      let layout = [];
+      while (total > 0) {
+        const rowSize = total >= 3 ? 3 : total;
+        layout.push(rowSize);
+        total -= rowSize;
+      }
+      return layout;
+    }
+
     function renderTeamsEditable() {
       const container = document.getElementById('schedule-container');
       container.innerHTML = '';
 
-      teamsData.forEach((team, index) => {
-        const teamDiv = document.createElement('div');
-        teamDiv.className = 'team-block';
+      const layout = getTeamLayout(teamsData.length);
+      let teamIndex = 0;
 
-        teamDiv.innerHTML = `
-          <ul>
-            <li>
-              Team Name: <input type="text" value="${team.teamName}" data-team-index="${index}" class="team-name-input">
-            </li>
-            ${team.players.map((player, pIndex) => `
+      layout.forEach(rowCount => {
+        const row = document.createElement('div');
+        row.className = 'flex-row';
+
+        for (let i = 0; i < rowCount; i++) {
+          const team = teamsData[teamIndex];
+          const teamDiv = document.createElement('div');
+          teamDiv.className = 'team-column';
+
+          teamDiv.innerHTML = `
+            <ul>
               <li>
-                Player ${pIndex + 1}: <input type="text" value="${player}" data-team-index="${index}" data-player-index="${pIndex}" class="player-name-input">
-              </li>`).join('')}
-          </ul>
-        `;
+                Team Name: <input type="text" value="${team.teamName}" data-team-index="${teamIndex}" class="team-name-input">
+              </li>
+              ${team.players.map((player, pIndex) => `
+                <li>
+                  Player ${pIndex + 1}: <input type="text" value="${player}" data-team-index="${teamIndex}" data-player-index="${pIndex}" class="player-name-input">
+                </li>`).join('')}
+            </ul>
+          `;
 
-        container.appendChild(teamDiv);
+          row.appendChild(teamDiv);
+          teamIndex++;
+        }
+
+        container.appendChild(row);
       });
     }
 
@@ -224,16 +269,14 @@
           container.appendChild(matchDiv);
         }
       }
-
-      // Save to localStorage
-      localStorage.setItem('schedule', JSON.stringify(schedule));
     }
 
     function startMatch(matchNo) {
-      const storedSchedule = JSON.parse(localStorage.getItem('schedule'));
-      const match = storedSchedule.find(m => m.matchNo === matchNo);
+      const match = schedule.find(m => m.matchNo === matchNo);
       if (match) {
-        window.location.href = `match.html?team1=${encodeURIComponent(match.team1)}&team2=${encodeURIComponent(match.team2)}&matchNo=${match.matchNo}`;
+        const team1 = encodeURIComponent(match.team1);
+        const team2 = encodeURIComponent(match.team2);
+        window.location.href = `match.html?team1=${team1}&team2=${team2}`;
       }
     }
   </script>
