@@ -114,7 +114,7 @@
 <body>
 
   <div class="container">
-    <h1>Tournament Setup</h1>
+    <h1>Cricket Tournament Setup</h1>
 
     <div class="row">
       <div>
@@ -162,7 +162,7 @@
 
       for (let i = 0; i < noOfTeams; i++) {
         let team = {
-          teamName: `Team ${i + 1}`,
+          teamName: `Team ${String.fromCharCode(65 + i)}`, // A, B, C, etc.
           players: []
         };
 
@@ -247,7 +247,7 @@
         teamsData[i].players[j] = input.value.trim();
       });
 
-      container.innerHTML = ''; // Clear previous content
+      container.innerHTML = '';
 
       let matchCount = 1;
       for (let i = 0; i < teamsData.length; i++) {
@@ -276,10 +276,9 @@
       if (match) {
         const team1 = encodeURIComponent(match.team1);
         const team2 = encodeURIComponent(match.team2);
-        window.location.href = `match.html?team1=${team1}&team2=${team2}`;
+        window.location.href = `match.html?team1=${team1}&team2=${team2}&matchNo=${matchNo}`;
       }
     }
   </script>
-
 </body>
 </html>
