@@ -2,27 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cricket Tournament - Team Generator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #f4f6f9;
       padding: 20px;
     }
 
     h1 {
-      background-color: #2e7d32;
-      color: white;
       text-align: center;
-      padding: 20px;
+      color: #333;
       margin-bottom: 20px;
     }
 
@@ -30,7 +27,8 @@
       margin-bottom: 20px;
     }
 
-    input, button {
+    input,
+    button {
       padding: 10px;
       font-size: 16px;
       width: 100%;
@@ -55,6 +53,7 @@
       display: grid;
       gap: 20px;
       margin-top: 30px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     }
 
     .team-card {
@@ -82,8 +81,8 @@
   <h1>Cricket Tournament - Team Generator</h1>
 
   <div class="form-group">
-    <label>Enter Team Names (comma separated):</label>
-    <input type="text" id="team-names" placeholder="e.g. MCT, ALLD, BURAIMI, IBRI"/>
+    <label for="team-names">Enter Team Names (comma separated):</label>
+    <input type="text" id="team-names" placeholder="e.g. MCT, ALLD, BURAIMI, IBRI" />
   </div>
 
   <button onclick="generateTeams()">Generate Teams</button>
@@ -129,16 +128,6 @@
         teamCard.appendChild(ul);
         container.appendChild(teamCard);
       });
-
-      // Adjust columns dynamically
-      const containerGrid = document.getElementById('teams-container');
-      const numTeams = teams.length;
-
-      if (numTeams <= 2) containerGrid.style.gridTemplateColumns = `repeat(${numTeams}, 1fr)`;
-      else if (numTeams <= 4) containerGrid.style.gridTemplateColumns = `repeat(2, 1fr)`;
-      else if (numTeams <= 6) containerGrid.style.gridTemplateColumns = `repeat(3, 1fr)`;
-      else if (numTeams <= 9) containerGrid.style.gridTemplateColumns = `repeat(3, 1fr)`;
-      else containerGrid.style.gridTemplateColumns = `repeat(4, 1fr)`;
     }
 
     function startMatch() {
@@ -147,7 +136,7 @@
         return;
       }
 
-      // Select first two teams for match (can later add random selection or allow user to choose)
+      // Select first two teams for match
       const selectedTeams = teamList.slice(0, 2);
 
       // Save to localStorage
