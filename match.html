@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Match - Cricket Tournament</title>
+  <title>Cricket Match</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
-
   <style>
     * {
       margin: 0;
@@ -17,143 +16,200 @@
       font-family: 'Poppins', sans-serif;
       background-color: #f4f6f9;
       color: #333;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     h1 {
       font-family: 'Roboto', sans-serif;
-      font-weight: 700;
-      color: #fff;
+      color: #2e7d32;
       text-align: center;
-      background-color: #2e7d32;
+      margin-bottom: 30px;
+    }
+
+    .match-info {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .toss-container {
+      background-color: #fff8e1;
       padding: 20px;
+      border-radius: 8px;
       margin-bottom: 20px;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
+    .toss-result {
+      font-size: 20px;
+      font-weight: bold;
+      color: #e65100;
+      text-align: center;
+      margin: 20px 0;
     }
 
-    .row {
+    .toss-options {
       display: flex;
+      justify-content: center;
       gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .row > div {
-      flex: 1 1 300px;
-      background-color: #fff;
-      padding: 20px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-    }
-
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      margin-top: 20px;
     }
 
     button {
-      background-color: #2e7d32;
-      color: white;
+      padding: 12px 25px;
       border: none;
-      cursor: pointer;
+      border-radius: 5px;
       font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
     }
 
-    button:hover {
-      background-color: #1b5e20;
+    .toss-btn {
+      background-color: #ff9800;
+      color: white;
     }
 
-    .team-block {
-      margin-top: 15px;
-      background: #eef1f5;
-      padding: 15px;
-      border-radius: 6px;
+    .toss-btn:hover {
+      background-color: #f57c00;
     }
 
-    ul {
-      list-style: none;
+    .bat-btn {
+      background-color: #4caf50;
+      color: white;
     }
 
-    li {
-      margin-bottom: 5px;
+    .bat-btn:hover {
+      background-color: #388e3c;
     }
 
-    #toss-section {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    .bowl-btn {
+      background-color: #f44336;
+      color: white;
     }
 
-    h3 {
-      font-weight: bold;
-      text-align: center;
+    .bowl-btn:hover {
+      background-color: #d32f2f;
+    }
+
+    .next-btn {
+      background-color: #2196f3;
+      color: white;
+      display: block;
+      margin: 30px auto 0;
+      padding: 12px 30px;
+    }
+
+    .next-btn:hover {
+      background-color: #1976d2;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h1>Cricket Tournament Match</h1>
-
-    <div id="toss-section">
-      <h3>🏆 Toss</h3>
-      <p><strong>Team 1:</strong> <span id="team1-name"></span></p>
-      <p><strong>Team 2:</strong> <span id="team2-name"></span></p>
-
-      <label for="toss-winner">Toss Winner:</label>
-      <select id="toss-winner">
-        <option value="team1">Team 1</option>
-        <option value="team2">Team 2</option>
-      </select>
-
-      <label for="bat-or-bowl">Choose to:</label>
-      <select id="bat-or-bowl">
-        <option value="bat">Bat</option>
-        <option value="bowl">Bowl</option>
-      </select>
-
-      <button onclick="submitToss()">Submit Toss</button>
+    <h1>Cricket Match</h1>
+    
+    <div class="match-info" id="match-info">
+      <!-- Filled by JavaScript -->
     </div>
 
+    <div class="toss-container" id="toss-container">
+      <h2>Toss Time!</h2>
+      <p>Click the button to simulate the toss between the two teams:</p>
+      
+      <div style="text-align: center;">
+        <button class="toss-btn" onclick="simulateToss()">Do the Toss</button>
+      </div>
+
+      <div class="toss-result hidden" id="toss-result">
+        <!-- Filled by JavaScript -->
+      </div>
+
+      <div class="hidden" id="toss-decision">
+        <p>What does the winning team choose to do?</p>
+        <div class="toss-options">
+          <button class="bat-btn" onclick="chooseBat()">Bat First</button>
+          <button class="bowl-btn" onclick="chooseBowl()">Bowl First</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden" id="match-start">
+      <h2>Match Summary</h2>
+      <div id="match-summary">
+        <!-- Filled by JavaScript -->
+      </div>
+      <button class="next-btn" onclick="returnToTournament()">Return to Tournament</button>
+    </div>
   </div>
 
   <script>
-    // Get team names from URL (Passed when clicking "Start Match")
+    // Get teams from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const team1 = urlParams.get('team1');
-    const team2 = urlParams.get('team2');
+    const team1 = decodeURIComponent(urlParams.get('team1'));
+    const team2 = decodeURIComponent(urlParams.get('team2'));
+    const matchNo = urlParams.get('matchNo');
 
-    // Display team names in Toss UI
-    document.getElementById('team1-name').textContent = team1;
-    document.getElementById('team2-name').textContent = team2;
+    // Set match info
+    document.getElementById('match-info').innerHTML = `
+      <strong>Match ${matchNo}</strong>: ${team1} vs ${team2}
+    `;
 
-    // Function to handle toss submission
-    function submitToss() {
-      const tossWinner = document.getElementById('toss-winner').value;
-      const batOrBowl = document.getElementById('bat-or-bowl').value;
+    let tossWinner = null;
+    let tossChoice = null;
 
-      // Save toss result to localStorage
-      localStorage.setItem('tossResult', JSON.stringify({
-        tossWinner,
-        batOrBowl,
-        team1,
-        team2
-      }));
+    function simulateToss() {
+      // Randomly select winning team (50/50 chance)
+      tossWinner = Math.random() < 0.5 ? team1 : team2;
+      
+      document.getElementById('toss-result').innerHTML = `
+        ${tossWinner} won the toss!
+      `;
+      
+      document.getElementById('toss-result').classList.remove('hidden');
+      document.getElementById('toss-decision').classList.remove('hidden');
+    }
 
-      // Redirect to the next page (Player Selection or scoring page)
-      alert(`Toss: ${tossWinner} chose to ${batOrBowl} first`);
+    function chooseBat() {
+      tossChoice = 'bat';
+      completeToss();
+    }
 
-      // For now, just redirect to player selection page (could be your next step)
-      window.location.href = 'player-selection.html';
+    function chooseBowl() {
+      tossChoice = 'bowl';
+      completeToss();
+    }
+
+    function completeToss() {
+      document.getElementById('toss-container').classList.add('hidden');
+      
+      const summary = document.getElementById('match-summary');
+      summary.innerHTML = `
+        <p><strong>Toss Result:</strong> ${tossWinner} won the toss and chose to ${tossChoice} first</p>
+        <p><strong>Match Started:</strong> ${team1} vs ${team2}</p>
+        <p>${tossChoice === 'bat' ? tossWinner : (tossWinner === team1 ? team2 : team1)} will bowl first</p>
+      `;
+      
+      document.getElementById('match-start').classList.remove('hidden');
+    }
+
+    function returnToTournament() {
+      window.location.href = 'tournament.html';
     }
   </script>
-
 </body>
 </html>
